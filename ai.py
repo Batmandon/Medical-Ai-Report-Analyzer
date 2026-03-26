@@ -20,7 +20,7 @@ def create_embedding(text):
 def response_document(text:str, file_id: int):
   
     response = client.models.generate_content(
-        model="gemini-2.5-pro",
+        model="gemini-2.5-flash",
         contents=
         f"""You are a medical report analyzer. Analyze this medical report and provide:
         1. A brief overview of what this report is about
@@ -59,7 +59,7 @@ def ask_document(context, question):
     {question}
     """
     response = client.models.generate_content(
-        model="gemini-2.5-pro",
+        model="gemini-2.5-flash",
         contents=prompt
     )
 
