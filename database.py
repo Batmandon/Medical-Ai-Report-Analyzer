@@ -1,8 +1,8 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from contextlib import contextmanager
+from config import DATABASE_URL
 
-DATABASE_URL = "postgresql://postgres.xiwtuaorinraemlwwttt:K8mo5HMKOoHoTAWZ@aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres"
 
 # ~~~~~~~~~~~~~~~~~~~~~~ DB connection context manager ~~~~~~~~~~~~~~~~~~~~~~~
 @contextmanager
