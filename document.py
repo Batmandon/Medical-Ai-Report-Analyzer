@@ -156,14 +156,17 @@ def get_file_summary(file_id: int, token: str):
 
         user_id = user["id"]
 
-        cursor.execute("SELECT s.summary FROM summaries s JOIN files f ON f.id = s.file_id WHERE s.file_id = %s AND f.user_id = %s", 
+        cursor.execute("SELECT s.summary, f.filename FROM summaries s JOIN files f ON f.id = s.file_id WHERE s.file_id = %s AND f.user_id = %s", 
                    (file_id, user_id))
         row = cursor.fetchone()
 
         if not row:
             return {"summary": None}
 
-        return {"summary": row["summary"]}
+        return {
+            "summary": row["summary"],
+            "filename": row["filename"]
+        }
 
 def chat_history(file_id: int , token: str):
     payload = decode_token(token)

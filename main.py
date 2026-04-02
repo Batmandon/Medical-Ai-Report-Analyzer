@@ -57,7 +57,7 @@ def logining_user(request: Request, User: UserLogin):
 def refresh_user(request: Request, User: UserRefresh):
     result = refresh(User)
     if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
+        raise HTTPException(status_code=401, detail=result["error"])
     return result
 
 @app.post("/summarize/document")
@@ -74,15 +74,15 @@ def ask_document_route(request: Request,
     body: QuestionRequest, token: str = Depends(oauth2_scheme)):
     result = answer_document(body, token)
     if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
+        raise HTTPException(status_code=401, detail=result["error"])
     return result
 
-@app.get("/my/files")
+@app.get("/user/files")
 @limiter.limit("5/minute")
 def my_files(request: Request, token: str = Depends(oauth2_scheme)):
     result = all_specific_user_documents(token)
     if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
+        raise HTTPException(status_code=401, detail=result["error"])
     return result
 
 @app.delete("/delete/files")
@@ -90,7 +90,7 @@ def my_files(request: Request, token: str = Depends(oauth2_scheme)):
 def delete_files(request: Request, file_id: int, token: str = Depends(oauth2_scheme)):
     result = delete_document(file_id, token)
     if "error" in result:
-        raise HTTPException(status_code=404, detail="File not Exists")
+        raise HTTPException(status_code=401, detail="File not Exists")
     return result
 
 @app.get("/files/{file_id}")
@@ -98,7 +98,7 @@ def delete_files(request: Request, file_id: int, token: str = Depends(oauth2_sch
 def get_file(request: Request, file_id: int, token: str = Depends(oauth2_scheme)):
     result = get_file_summary(file_id, token)
     if "error" in result:
-        raise HTTPException(status_code=404, detail=result["error"])
+        raise HTTPException(status_code=401, detail=result["error"])
     return result
 
 @app.get("/chat/history/{file_id}")
@@ -106,5 +106,5 @@ def get_file(request: Request, file_id: int, token: str = Depends(oauth2_scheme)
 def get_chat_history(request: Request, file_id: int, token: str = Depends(oauth2_scheme)):
     result = chat_history(file_id, token)
     if isinstance(result,dict) and "error" in result:
-        raise HTTPException(status_code=404, detail="File not Exists")
+        raise HTTPException(status_code=401, detail="File not Exists")
     return result

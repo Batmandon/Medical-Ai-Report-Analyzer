@@ -5,6 +5,7 @@ const chatInput = document.getElementById('chat-input');
 const uploadBtn = document.getElementById('UploadBtn');
 const fileInput = document.getElementById('file-input');
 const sendBtn = document.getElementById('SendBtn');
+const newChatBtn = document.getElementById('NewchatBtn');
 let file = null;
 
 // Initialize the toggle button position
@@ -92,7 +93,6 @@ function addMessage(text, type) {
 
     if (type === 'ai-message') {
         const parsed = marked.parse(text);
-        console.log("parsed HTML:", parsed);
         msg.innerHTML = parsed;
     } else {
         msg.textContent = text;
@@ -125,28 +125,102 @@ sendBtn.addEventListener('click', async() => {
         loadingMsg.innerHTML = `<span class="dot"></span><span class="dot"></span><span class="dot"></span>`;
         document.getElementById('chat-messages').appendChild(loadingMsg);
         loadingMsg.scrollIntoView({ behavior: 'smooth' });
-
+        
         const formData = new FormData();
         formData.append("file", file);
-
+        
         const response = await fetchWithAuth("http://localhost:8000/summarize/document", {
             method: "POST",
             body: formData
         });
-
+        
         const data = await response.json();
-
+        
         loadingMsg.remove();
-
+        
         if (data.summary) {
             addMessage(data.summary, 'ai-message'); // AI message using helper
             file = null;
             fileInput.value = "";
+            loadUserFiles();
         }
-
+        
     } catch (error) {
         console.error("Error caught:", error);
     }
 });
 
 
+newChatBtn.addEventListener('click', () => {
+    document.getElementById('chat-messages').innerHTML = '';
+    document.querySelector('h1').style.display = 'block';
+    document.getElementById('chat-container').classList.remove('has-messages');
+    file = null;
+    fileInput.value = "";
+    newChatBtn.scrollIntoView({ behavior: 'smooth' });
+});
+
+async function loadUserFiles() {
+    try {
+        const response = await fetchWithAuth("http://localhost:8000/user/files");
+        const files = await response.json();
+
+        const chatList = document.getElementById('chat-list');
+        const noChats = document.getElementById('nochats');
+
+        if (!files || files.length === 0) {
+            noChats.style.display = 'block';
+            return;
+        }
+
+        noChats.style.display = 'none';
+        chatList.innerHTML = '';
+
+        files.forEach(file => {
+            const li = document.createElement('li');
+            li.textContent = file.filename;
+            li.dataset.fileId = file.id;
+            li.classList.add('chat-item');
+            li.addEventListener('click', () => loadFileChat(file.id));
+            chatList.appendChild(li);
+        });
+
+    } catch (error) {
+        console.error("Error loading files:", error);
+    }    
+}
+
+async function loadFileChat(fileId) {
+
+    try {
+        //  Load file summary
+        const response = await fetchWithAuth(`http://localhost:8000/files/${fileId}`);
+        const data = await response.json();
+        console.log("File summary response:", data);
+    
+        if (data.summary) {
+            document.getElementById('chat-messages').innerHTML = '';
+            addMessage(`📄 ${data.filename}`, 'user-message');
+            addMessage(data.summary, 'ai-message');
+        }
+
+        // Load chat history
+        const chatHistoryResponse = await fetchWithAuth(`http://localhost:8000/chat/history/${fileId}`);
+        const chatHistory = await chatHistoryResponse.json();
+
+        if (Array.isArray(chatHistory)) {
+            chatHistory.forEach(msg => {
+                if (msg.role === 'user') {
+                    addMessage(msg.content, 'user-message');
+                } else if (msg.role === 'model') {
+                    addMessage(msg.content, 'ai-message');
+                }
+            });
+        }
+    } catch (error) {
+        console.error("Error loading file chat:", error);
+    }
+
+}
+
+loadUserFiles();

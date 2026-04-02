@@ -257,3 +257,19 @@ h1 {
     font-weight: 700;
     margin: 8px 0 4px 0;
 }
+
+.chat-item {
+    list-style: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #094fe7;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-item:hover {
+    background: rgba(9, 79, 231, 0.08);
+}
