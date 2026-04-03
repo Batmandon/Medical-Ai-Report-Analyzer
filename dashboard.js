@@ -44,7 +44,7 @@ async function fetchWithAuth(url, options = {}) {
     if (response.status === 401) {
 
         const refresh_token = localStorage.getItem("refresh_token");
-        const refreshResponse = await fetch("http://localhost:8000/refresh", {
+        const refreshResponse = await fetch("https://medical-report-analyzer-ai-production.up.railway.app/refresh", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
@@ -124,7 +124,7 @@ sendBtn.addEventListener('click', async () => {
             const formData = new FormData();
             formData.append("file", file);
 
-            const response = await fetchWithAuth("http://localhost:8000/summarize/document", {
+            const response = await fetchWithAuth("https://medical-report-analyzer-ai-production.up.railway.app/summarize/document", {
                 method: "POST",
                 body: formData
             });
@@ -163,7 +163,7 @@ sendBtn.addEventListener('click', async () => {
             document.getElementById('chat-messages').appendChild(loadingMsg);
             loadingMsg.scrollIntoView({ behavior: 'smooth' });
 
-            const response = await fetchWithAuth("http://localhost:8000/ask/document", {
+            const response = await fetchWithAuth("https://medical-report-analyzer-ai-production.up.railway.app/ask/document", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -205,7 +205,7 @@ newChatBtn.addEventListener('click', () => {
 
 async function loadUserFiles() {
     try {
-        const response = await fetchWithAuth("http://localhost:8000/user/files");
+        const response = await fetchWithAuth("https://medical-report-analyzer-ai-production.up.railway.app/user/files");
         const files = await response.json();
 
         const chatList = document.getElementById('chat-list');
@@ -237,7 +237,7 @@ async function loadUserFiles() {
                 }
 
             try {
-                const response = await fetchWithAuth(`http://localhost:8000/delete/files?file_id=${file.id}`, {
+                const response = await fetchWithAuth(`https://medical-report-analyzer-ai-production.up.railway.app/delete/files?file_id=${file.id}`, {
                     method: "DELETE"
                 });
 
@@ -273,7 +273,7 @@ async function loadFileChat(fileId) {
 
     try {
         //  Load file summary
-        const response = await fetchWithAuth(`http://localhost:8000/files/${fileId}`);
+        const response = await fetchWithAuth(`https://medical-report-analyzer-ai-production.up.railway.app/files/${fileId}`);
         const data = await response.json();
         console.log("File summary response:", data);
 
@@ -284,7 +284,7 @@ async function loadFileChat(fileId) {
         }
 
         // Load chat history
-        const chatHistoryResponse = await fetchWithAuth(`http://localhost:8000/chat/history/${fileId}`);
+        const chatHistoryResponse = await fetchWithAuth(`https://medical-report-analyzer-ai-production.up.railway.app/chat/history/${fileId}`);
         const chatHistory = await chatHistoryResponse.json();
 
         if (Array.isArray(chatHistory)) {
