@@ -194,14 +194,17 @@ sendBtn.addEventListener('click', async () => {
     }
 });
 
-newChatBtn.addEventListener('click', () => {
+function resetToNewChat() { 
     document.getElementById('chat-messages').innerHTML = '';
     document.querySelector('h1').style.display = 'block';
     document.getElementById('chat-container').classList.remove('has-messages');
     file = null;
     fileInput.value = "";
+    currentFileId = null;
     newChatBtn.scrollIntoView({ behavior: 'smooth' });
-});
+};
+
+newChatBtn.addEventListener('click', resetToNewChat);
 
 async function loadUserFiles() {
     try {
@@ -246,10 +249,7 @@ async function loadUserFiles() {
                     alert(`${file.filename} deleted successfully.`);
 
                     if (Number(currentFileId) === Number(file.id)) {
-                        document.getElementById('chat-messages').innerHTML = '';
-                        document.querySelector('h1').style.display = 'block';
-                        document.getElementById('chat-container').classList.remove('has-messages');                    
-                        currentFileId = null;
+                        resetToNewChat();
                     }
                 } else {
                     alert(`Failed to delete ${file.filename}. Try again.`);
